@@ -64,6 +64,16 @@ Push a version tag, e.g. `git tag v1.0.0 && git push origin v1.0.0`, or open the
 9. **+ Add a form** (below the forms) adds a section for another IRS form, e.g. Schedule 2: enter its name, the title printed on the form and, optionally, the IRS file name (`f1040s2`). It shows up for every person and year. A section that nobody has a PDF or entries for yet has **Remove this section**.
 10. **Exchange rate** (below the forms) holds the IRS yearly average rate for the Swiss franc, one number per tax year, shared by everyone. The converter in the sidebar turns CHF amounts into U.S. dollars at the selected year's rate.
 
+## Starting from a return you already filed
+
+No need to retype last year. If you still have last year's return as a filled-in PDF, Taxodermy can read the values in it and carry them over into this year's forms:
+
+1. Select last year (`+ Year` adds it if it isn't there yet) and add your filled-in PDFs there, just like blank forms: drop them anywhere or use **Choose PDF**. Your entries show up in the form, ready to check or correct.
+2. Switch to this year and add the blank forms for this year.
+3. Open a form and click **Carry over from <last year>**. The values from the filled PDF, plus anything you changed in the app, go into the matching fields of this year's form.
+
+This works with PDFs whose form fields can still be clicked and typed into, e.g. the IRS forms filled in with Adobe Reader, Preview or Taxodermy itself. If the values were flattened into the page (common when tax software or a "print to PDF" produced the file) or the PDF is a scan, there are no fields to read the values from.
+
 ## Files
 
 ```
