@@ -2,6 +2,8 @@
 
 *Stuffing last year's numbers into this year's forms.*
 
+**[⬇ Download the app for Windows or Mac](#download-the-app-windows-and-mac)** · **[Run it from the source code](#or-run-it-from-the-source-code)**
+
 Every spring the IRS hands you the same forms as last year, with a few lines renumbered just to keep you on your toes. Taxodermy opens the official fillable PDFs as tidy forms in your browser, then carries last year's answers over into this year's forms. It matches fields by the label printed next to each box, not by internal field names that change every year. Keep returns for several people side by side, convert Swiss francs at the IRS yearly rate, and save the filled PDFs ready to print and sign. It does not do your taxes: you still decide every number, it just spares you the retyping.
 
 ![Taxodermy with Form 1040 for 2025 open: the list of forms on the left, the fields as a form in the middle, the original PDF page on the right, and an offer to carry over 4 values from 2024](docs/screenshot.webp)
