@@ -1,0 +1,52 @@
+# Builds standalone programs for Windows and macOS (Apple Silicon and Intel), so nobody
+# needs Python or Node. Push a tag like v1.0.0 to publish them as a GitHub Release;
+# "Run workflow" on the Actions tab builds them without publishing (see the run's artifacts).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest # can cross-build Windows too, and can sign the macOS programs
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          # target, zip name, program name. "baseline" also runs on older x64 CPUs and under Rosetta.
+          build() {
+            dir="dist/$2/taxodermy"
+            mkdir -p "$dir/data"
+            bun build --compile --target="$1" server.js --outfile "$dir/$3"
+            cp -R index.html assets README.md "$dir/"
+            cp data/forms.json "$dir/data/"
+          }
+          build bun-windows-x64-baseline taxodermy-windows Taxodermy.exe
+          build bun-darwin-arm64 taxodermy-macos-apple-silicon Taxodermy
+          build bun-darwin-x64-baseline taxodermy-macos-intel Taxodermy
+          # ad-hoc signature: Apple Silicon refuses to run unsigned programs at all
+          for d in dist/taxodermy-macos-*; do codesign --force --sign - "$d/taxodermy/Taxodermy"; done
+          for d in dist/*/; do (cd "$d" && zip -qry "../$(basename "$d").zip" taxodermy); done
+          ls -l dist/*.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taxodermy
+          path: dist/*.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/*.zip --title "Taxodermy $GITHUB_REF_NAME" --generate-notes

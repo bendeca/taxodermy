@@ -10,15 +10,44 @@ Every spring the IRS hands you the same forms as last year, with a few lines ren
 
 ## Start
 
+### Download the app (Windows and Mac)
+
+Nothing to install. From the [latest release](https://github.com/bendeca/taxodermy/releases/latest), download the zip for your computer:
+
+| Computer | Download |
+| --- | --- |
+| Windows | `taxodermy-windows.zip` |
+| Mac with Apple chip (M1 or newer) | `taxodermy-macos-apple-silicon.zip` |
+| Mac with Intel chip | `taxodermy-macos-intel.zip` |
+
+Not sure which Mac you have? Apple menu → About This Mac: “Chip: Apple M…” means Apple Silicon, “Processor: Intel…” means Intel.
+
+Unzip it somewhere you'll find it again, e.g. your Documents folder, and double-click **Taxodermy** inside the `taxodermy` folder. A small window opens (that is the app's server, keep it open while you work) and the app opens in your browser. Close that window to quit. Your entries are saved in the `data` folder right next to the program.
+
+The program isn't signed by a paid Apple or Microsoft developer account, so the first start shows a warning:
+
+- **Mac:** “Apple could not verify Taxodermy…”. Click **Done**, open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to Taxodermy, then confirm. On older macOS versions, right-click Taxodermy, choose **Open** and confirm instead. You only do this once.
+- **Windows:** “Windows protected your PC”. Click **More info**, then **Run anyway**.
+
+**Updating:** unzip the new version, then move your `data` folder from the old `taxodermy` folder into the new one, replacing the `data` folder that comes with it.
+
+### Or run it from the source code
+
+If you have Python 3 or Node installed:
+
 ```
 git clone https://github.com/bendeca/taxodermy.git
 cd taxodermy
 python3 server.py        # or: node server.js
 ```
 
-Then open http://127.0.0.1:8040/ (it opens by itself). Options: `--port 8041`, `--data /path/to/folder`, `--no-open`.
+Then open http://127.0.0.1:8040/ (it opens by itself). Options, for the downloaded program too: `--port 8041`, `--data /path/to/folder`, `--no-open`.
 
-Opening `index.html` directly does not work: a browser page cannot write files, which is all the small server is for. It listens on 127.0.0.1 only and needs nothing installed besides Python 3 or Node.
+Opening `index.html` directly does not work: a browser page cannot write files, which is all the small server is for. It listens on 127.0.0.1 only.
+
+### Publishing a new version
+
+Push a version tag, e.g. `git tag v1.0.0 && git push origin v1.0.0`. The **Release** workflow on GitHub builds the three zips and publishes them as a release. It compiles `server.js` with [Bun](https://bun.sh) into a single program; the app files sit next to it.
 
 ## Use
 
@@ -38,7 +67,7 @@ Opening `index.html` directly does not work: a browser page cannot write files, 
 ```
 index.html
 assets/                  app code, styles, PDF engine (pdf.js)
-server.py  server.js     the same tiny file server, twice
+server.py  server.js     the same tiny file server, twice (server.js is also what the downloadable program is built from)
 data/
   forms.json             the list of form sections (edit to add e.g. Schedule 2)
   people.json            the people and their display names

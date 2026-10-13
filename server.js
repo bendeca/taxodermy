@@ -12,7 +12,10 @@ const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
 
-const ROOT = __dirname;
+// Built into a standalone program (see .github/workflows/release.yml), the app files sit next to the executable.
+const STANDALONE = typeof Bun !== 'undefined' && /[\\/](\$bunfs|~BUN)[\\/]/.test(Bun.main);
+const ROOT = STANDALONE ? path.dirname(process.execPath) : __dirname;
+const SELF = STANDALONE ? path.basename(process.execPath) : 'node server.js';
 const arg = (name, dflt) => { const i = process.argv.indexOf('--' + name); return i > -1 ? process.argv[i + 1] : dflt; };
 const PORT = parseInt(arg('port', '8040'), 10);
 const DATA = path.resolve(arg('data', path.join(ROOT, 'data')));
@@ -137,7 +140,14 @@ const server = http.createServer(async (req, res) => {
 });
 
 fs.mkdirSync(DATA, { recursive: true });
-server.on('error', (err) => { console.error(`Could not start on port ${PORT} (${err.message}). Try: node server.js --port 8041`); process.exit(1); });
+/* Started by double-click, the window would close before the message can be read. */
+function fail(msg) {
+  console.error(msg);
+  if (!STANDALONE || !process.stdin.isTTY) process.exit(1);
+  console.error('Press Enter to close.');
+  process.stdin.once('data', () => process.exit(1));
+}
+server.on('error', (err) => fail(`Could not start on port ${PORT} (${err.message}). Is Taxodermy already running? Otherwise try: ${SELF} --port 8041`));
 server.listen(PORT, '127.0.0.1', () => {
   const url = `http://127.0.0.1:${PORT}/`;
   console.log(`Taxodermy is running at ${url}\nData folder: ${DATA}\nPress Ctrl+C to stop.`);

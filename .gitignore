@@ -3,3 +3,6 @@
 !/data/forms.json
 
 .DS_Store
+
+# Built release zips
+/dist/
