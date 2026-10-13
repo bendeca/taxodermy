@@ -4,6 +4,8 @@
 
 Every spring the IRS hands you the same forms as last year, with a few lines renumbered just to keep you on your toes. Taxodermy opens the official fillable PDFs as tidy forms in your browser, then carries last year's answers over into this year's forms. It matches fields by the label printed next to each box, not by internal field names that change every year. Keep returns for several people side by side, convert Swiss francs at the IRS yearly rate, and save the filled PDFs ready to print and sign. It does not do your taxes: you still decide every number, it just spares you the retyping.
 
+**Made with Americans abroad in mind.** The forms that come set up are the usual expat set: Form 1040 with Schedules 1 and 3, Form 2555 (Foreign Earned Income), Form 1116 (Foreign Tax Credit) and Form 8938 (Foreign Financial Assets). That's only a starting point. Click **+ Add a form** to add any other IRS form, and remove the ones you don't need, so the list fits your own return.
+
 > **Everything stays on your computer.** There is no cloud, no account, no tracking and no database. The app is a tiny server that listens only on your own machine (127.0.0.1), and your entries are plain files in the `data` folder. Nothing is ever uploaded or sent anywhere: the app makes no outside requests. The only time anything touches the internet is when you click a link to irs.gov yourself.
 
 ## Start
