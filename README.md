@@ -47,7 +47,7 @@ Opening `index.html` directly does not work: a browser page cannot write files, 
 
 ### Publishing a new version
 
-Push a version tag, e.g. `git tag v1.0.0 && git push origin v1.0.0`. The **Release** workflow on GitHub builds the three zips and publishes them as a release. It compiles `server.js` with [Bun](https://bun.sh) into a single program; the app files sit next to it.
+Push a version tag, e.g. `git tag v1.0.0 && git push origin v1.0.0`, or open the **Release** workflow on the Actions tab, click **Run workflow** and enter the version. The workflow on GitHub builds the three zips and publishes them as a release. It compiles `server.js` with [Bun](https://bun.sh) into a single program; the app files sit next to it.
 
 ## Use
 
