@@ -1,0 +1,5 @@
+# Personal tax data written by the app (unencrypted). Only the form list is tracked.
+/data/*
+!/data/forms.json
+
+.DS_Store
