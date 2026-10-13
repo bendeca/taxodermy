@@ -1,0 +1,50 @@
+{
+  "forms": [
+    {
+      "id": "1040",
+      "name": "Form 1040",
+      "title": "U.S. Individual Income Tax Return",
+      "irsFile": "f1040",
+      "detect": "U\\.S\\. Individual Income Tax Return",
+      "detectNot": "Amended|SCHEDULE"
+    },
+    {
+      "id": "1040-schedule-1",
+      "name": "Schedule 1",
+      "title": "Additional Income and Adjustments to Income",
+      "irsFile": "f1040s1",
+      "detect": "Additional Income and Adjustments to Income"
+    },
+    {
+      "id": "1040-schedule-3",
+      "name": "Schedule 3",
+      "title": "Additional Credits and Payments",
+      "irsFile": "f1040s3",
+      "detect": "Additional Credits and Payments"
+    },
+    {
+      "id": "2555",
+      "name": "Form 2555",
+      "title": "Foreign Earned Income",
+      "irsFile": "f2555",
+      "detect": "Foreign Earned Income"
+    },
+    {
+      "id": "1116",
+      "name": "Form 1116",
+      "title": "Foreign Tax Credit",
+      "irsFile": "f1116",
+      "detect": "Foreign Tax Credit"
+    },
+    {
+      "id": "8938",
+      "name": "Form 8938",
+      "title": "Statement of Specified Foreign Financial Assets",
+      "irsFile": "f8938",
+      "detect": "Statement of Specified Foreign Financial Assets",
+      "repeatPages": [
+        2
+      ]
+    }
+  ]
+}

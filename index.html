@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taxodermy</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-view="split">
+
+<header class="bar">
+  <div class="brand" title="Taxodermy — stuffing last year's numbers into this year's forms"><img src="assets/logo.svg" alt="" width="28" height="28"><span>Taxodermy</span></div>
+  <label class="who" id="who" hidden><span>Person</span><select id="person" aria-label="Person"></select></label>
+  <nav class="years" id="years" aria-label="Tax year"></nav>
+  <button class="btn" type="button" id="printBtn" hidden>Print</button>
+  <span class="saved" id="status" role="status" aria-live="polite"></span>
+</header>
+
+<div class="shell">
+  <aside class="side" aria-label="Forms">
+    <ul id="formList"></ul>
+    <ul id="extraList"></ul>
+    <div class="conv" id="sideConv" hidden></div>
+    <p class="hint">Drop PDFs anywhere. They are filed under the selected year and sorted into the matching form.</p>
+    <p class="hint" id="folder"></p>
+  </aside>
+
+  <div class="main">
+    <div class="head" id="head" hidden>
+      <div class="doc"><b id="docName"></b><span id="docMeta"></span></div>
+      <div class="actions" id="actions">
+        <div class="seg" role="group" aria-label="Layout">
+          <button type="button" data-view="form">Form</button>
+          <button type="button" data-view="split">Split</button>
+          <button type="button" data-view="page">Page</button>
+        </div>
+        <button class="btn" type="button" id="carryBtn" hidden></button>
+        <button class="btn" type="button" id="replaceBtn">Replace PDF…</button>
+        <button class="btn quiet" type="button" id="clearBtn">Clear all</button>
+        <button class="btn primary" type="button" id="saveBtn" title="Writes the filled PDF into this year's folder, next to the blank form">Save to disk</button>
+      </div>
+    </div>
+    <div class="progress" id="progress" hidden><i></i></div>
+    <div class="carry" id="carry" hidden></div>
+
+    <main id="empty" hidden></main>
+    <main id="ratesView" hidden></main>
+
+    <main id="work" hidden>
+      <section class="pane" id="formPane" aria-label="Form fields">
+        <div class="tools">
+          <input class="search" id="search" type="search" placeholder="Search fields, e.g. “dividends” or “1a”" aria-label="Search fields">
+          <div class="seg" role="group" aria-label="Show">
+            <button type="button" data-show="all" aria-pressed="true">All</button>
+            <button type="button" data-show="empty" aria-pressed="false">Empty</button>
+            <button type="button" data-show="filled" aria-pressed="false">Filled</button>
+            <button type="button" data-show="carried" aria-pressed="false" id="showCarried" hidden>To check</button>
+          </div>
+        </div>
+        <div class="scroll" id="formScroll"></div>
+      </section>
+      <section class="pane" id="pagePane" aria-label="Original pages">
+        <div class="tools">
+          <span class="zoom">Click a box on the page to fill it in place</span>
+          <span class="zoom">
+            <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
+            <span id="zoomPct">100%</span>
+            <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
+            <button type="button" class="fit" id="zoomFit">Fit width</button>
+          </span>
+        </div>
+        <div class="scroll" id="pageScroll"><div id="pages"></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="toast" hidden role="status"></div>
+<input type="file" id="file" accept="application/pdf,.pdf" multiple hidden>
+<noscript>This page needs JavaScript.</noscript>
+<script type="module" src="assets/app.js"></script>
+</body>
+</html>

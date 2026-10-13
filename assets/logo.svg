@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Taxodermy">
+  <title>Taxodermy</title>
+  <!-- antlers -->
+  <g fill="none" stroke="#6b4423" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 17 C22 11 18 8 12 5"/>
+    <path d="M19.5 10 C17 10 14 12 12 15"/>
+    <path d="M16 7.5 C15 5.5 15 3.5 16 2"/>
+    <path d="M40 17 C42 11 46 8 52 5"/>
+    <path d="M44.5 10 C47 10 50 12 52 15"/>
+    <path d="M48 7.5 C49 5.5 49 3.5 48 2"/>
+  </g>
+  <!-- mounting plaque -->
+  <path d="M10 27 h44 v10 c0 11 -10 19 -22 24 c-12 -5 -22 -13 -22 -24 z" fill="#a8743f" stroke="#6b4423" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M15 31 h34 v6 c0 8 -7 14 -17 18 c-10 -4 -17 -10 -17 -18 z" fill="none" stroke="#c9945c" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- the stuffed tax form -->
+  <path d="M21 15 h17 l5 5 v24 a1.5 1.5 0 0 1 -1.5 1.5 h-20.5 a1.5 1.5 0 0 1 -1.5 -1.5 v-27.5 a1.5 1.5 0 0 1 1.5 -1.5 z" fill="#fffdf7" stroke="#1f4f7d" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M38 15 v5 h5 z" fill="#d6e2ee" stroke="#1f4f7d" stroke-width="2.4" stroke-linejoin="round"/>
+  <g stroke="#1f4f7d" stroke-width="2.2" stroke-linecap="round">
+    <path d="M24.5 25 h9"/>
+    <path d="M24.5 30.5 h14"/>
+    <path d="M24.5 36 h14"/>
+  </g>
+  <path d="M34 40.5 h4.5" stroke="#c98a12" stroke-width="2.6" stroke-linecap="round"/>
+</svg>
