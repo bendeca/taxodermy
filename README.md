@@ -11,6 +11,8 @@ Every spring the IRS hands you the same forms as last year, with a few lines ren
 ## Start
 
 ```
+git clone https://github.com/bendeca/taxodermy.git
+cd taxodermy
 python3 server.py        # or: node server.js
 ```
 
