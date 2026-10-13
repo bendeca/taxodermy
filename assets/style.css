@@ -245,7 +245,7 @@ body.dragging .main { outline: 3px dashed var(--accent); outline-offset: -6px; }
 .conv output { flex: 1; min-width: 0; font: 600 14px/1.2 var(--mono); overflow-wrap: anywhere; }
 .conv.wide { margin: 24px 0 0; max-width: 340px; }
 .conv.wide > .btn { justify-self: start; }
-#ratesView { flex: 1; overflow: auto; background: var(--bg); padding: 28px 24px 60px; }
+#ratesView, #formView { flex: 1; overflow: auto; background: var(--bg); padding: 28px 24px 60px; }
 .rates { max-width: 860px; margin: 0 auto; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
 .rates h1 { font-size: 22px; letter-spacing: -0.02em; margin: 0 0 8px; }
 .rates p { color: var(--muted); margin: 0 0 18px; max-width: 70ch; text-wrap: pretty; }
@@ -265,7 +265,7 @@ body.dragging .main { outline: 3px dashed var(--accent); outline-offset: -6px; }
 @media (max-width: 860px) {
   .side #extraList { margin: 0 0 0 4px; padding: 0 0 0 4px; border-top: 0; border-left: 1px solid var(--line); }
   .side .conv { display: none; }
-  #ratesView { padding: 12px; } .rates { padding: 18px 14px; }
+  #ratesView, #formView { padding: 12px; } .rates { padding: 18px 14px; }
 }
 
 .doc span a { color: var(--accent); }
@@ -297,3 +297,18 @@ form.drop input:focus { outline: 2px solid var(--accent); outline-offset: -1px; 
 .brand { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; }
 .brand img { display: block; flex: none; }
 @media (max-width: 860px) { .brand span { display: none; } }
+
+/* ---------- adding a form ---------- */
+.side li.addform button { color: var(--muted); font-size: 13px; padding: 6px 10px; }
+.side li.addform button:hover, .side li.addform button[aria-current="true"] { color: var(--ink); }
+.addform { max-width: 640px; }
+.addform .fields { display: grid; gap: 14px; }
+.addform label { display: grid; gap: 4px; }
+.addform label b { font-weight: 650; font-size: 13px; }
+.addform label small { color: var(--muted); font-size: 12px; text-wrap: pretty; }
+.addform input { padding: 7px 9px; border: 1px solid var(--field); border-radius: 6px; background: var(--panel); color: inherit; font: inherit; min-width: 0; }
+.addform input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.addform .msg { color: var(--danger); margin: 14px 0 0; min-height: 1em; }
+.addform .msg:empty { display: none; }
+.addform .btns { margin-top: 18px; }
+.drop .btns.remove { margin-top: 12px; }

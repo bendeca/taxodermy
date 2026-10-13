@@ -162,7 +162,7 @@ async function onPersonPicked() {
     const name = (prompt('Name of the person whose returns you want to add:') || '').trim().replace(/\s+/g, ' ');
     if (!name) return renderPeople();
     if (S.people.some((p) => p.name.toLowerCase() === name.toLowerCase())) { toast(`${name} already exists.`); return renderPeople(); }
-    try { const id = await createPerson(name); await refreshTree(); go(S.year, S.formId === 'rates' ? S.forms[0].id : S.formId, id); }
+    try { const id = await createPerson(name); await refreshTree(); go(S.year, RESERVED.includes(S.formId) ? S.forms[0].id : S.formId, id); }
     catch (e) { status('Could not add the person: ' + e.message, true); renderPeople(); }
   } else if (v === '~') {
     const me = S.people.find((p) => p.id === S.person);
@@ -258,6 +258,11 @@ function renderSidebar() {
     } else b.append(el('em', '', 'PDF added'));
     li.append(b); ul.append(li);
   }
+  const li = el('li', 'addform'); const add = el('button', '', '+ Add a form'); add.type = 'button';
+  add.title = 'Add a section for another IRS form, e.g. Schedule 2';
+  add.setAttribute('aria-current', S.formId === ADD_FORM);
+  add.onclick = () => go(S.year, ADD_FORM);
+  li.append(add); ul.append(li);
   renderRatesEntry();
 }
 
@@ -397,6 +402,76 @@ function showRates() {
   status('');
 }
 
+/* ---------- adding and removing form sections: data/forms.json ---------- */
+const ADD_FORM = 'add-form';
+const RESERVED = ['rates', ADD_FORM];
+const escapeRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const saveForms = () => api.put('data/forms.json', JSON.stringify({ forms: S.forms }, null, 2), 'application/json');
+/* Does anyone have a PDF or entries for this form, in any year? */
+const formInUse = (id) => Object.values(S.tree.people).some((p) => Object.values(p.years).some((files) => Object.keys(files).some((n) => n === id + '.pdf' || n === id + '.json' || n === id + '-filled.pdf')));
+function newFormId(name) {
+  let base = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/^(irs\s+)?form\s+/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-filled$/, '').slice(0, 40) || 'form';
+  if (RESERVED.includes(base)) base += '-form';
+  let id = base, n = 2;
+  while (S.forms.some((f) => f.id === id || f.id + '-filled' === id || id + '-filled' === f.id)) id = `${base}-${n++}`;
+  return id;
+}
+function showAddForm() {
+  const view = $('formView'); view.textContent = ''; view.hidden = false;
+  const pre = S.addPrefill || {}; S.addPrefill = null;
+  const wrap = el('form', 'rates addform');
+  wrap.append(el('h1', '', 'Add a form'),
+    el('p', '', 'Adds a section to the list on the left, for every person and year. Then add the blank, fillable PDF for it as usual.'));
+  const grid = el('div', 'fields');
+  const field = (label, input, help) => {
+    const l = el('label'); l.append(el('b', '', label), input); if (help) l.append(el('small', '', help)); grid.append(l); return input;
+  };
+  const input = (placeholder, value = '', max = 80) => { const i = el('input'); i.type = 'text'; i.placeholder = placeholder; i.value = value; i.maxLength = max; return i; };
+  const name = field('Name', input('e.g. Schedule 2', '', 40), 'Short name shown in the list.');
+  const title = field('Title', input('e.g. Additional Taxes', '', 120), 'The title printed on the form. Dropped PDFs whose first page shows this text are sorted into this section.');
+  const irs = field('IRS file name (optional)', input('e.g. f1040s2', pre.irsFile || '', 20), 'The name of the PDF on irs.gov, without “.pdf”. Dropped files with this name are sorted here, and a download link is shown.');
+  const repeat = field('Pages that can be added several times (optional)', input('e.g. 2', '', 20), 'Page numbers, separated by commas, as Form 8938 does for page 2.');
+  repeat.inputMode = 'numeric';
+  wrap.append(grid);
+  const msg = el('p', 'msg'); msg.setAttribute('role', 'alert');
+  const btn = el('button', 'btn primary', 'Add form'); btn.type = 'submit';
+  const btns = el('div', 'btns'); btns.append(btn); wrap.append(msg, btns);
+  const files = el('p', 'files'); files.append('The list is kept in ', el('code', '', 'data/forms.json'), ', shared by everyone.'); wrap.append(files);
+  wrap.onsubmit = async (e) => {
+    e.preventDefault();
+    const n = name.value.trim().replace(/\s+/g, ' '), t = title.value.trim().replace(/\s+/g, ' '), f = irs.value.trim().toLowerCase().replace(/\.pdf$/, '');
+    const pages = repeat.value.split(/[\s,;]+/).filter(Boolean);
+    const fail = (text, at) => { msg.textContent = text; at.focus(); };
+    if (!n) return fail('Enter a name.', name);
+    if (!t) return fail('Enter the title printed on the form.', title);
+    if (S.forms.some((x) => x.name.toLowerCase() === n.toLowerCase())) return fail(`There is already a form called ${n}.`, name);
+    if (f && !/^[a-z0-9_-]+$/.test(f)) return fail('The IRS file name has only letters and digits, like f1040s2.', irs);
+    if (f && S.forms.some((x) => x.irsFile === f)) return fail(`${S.forms.find((x) => x.irsFile === f).name} already uses the IRS file name ${f}.`, irs);
+    if (pages.some((p) => !/^\d{1,3}$/.test(p) || +p < 1)) return fail('Enter page numbers such as 2, or leave it empty.', repeat);
+    const entry = { id: newFormId(n), name: n, title: t };
+    if (f) entry.irsFile = f;
+    entry.detect = escapeRe(t);
+    if (pages.length) entry.repeatPages = [...new Set(pages.map(Number))].sort((a, b) => a - b);
+    btn.disabled = true;
+    S.forms.push(entry);
+    try { await saveForms(); }
+    catch (err) { S.forms.pop(); btn.disabled = false; return fail('Could not save: ' + err.message, name); }
+    toast(`${n} added. Now add its blank PDF for ${S.year}.`);
+    go(S.year, entry.id);
+  };
+  view.append(wrap); name.focus();
+  status('');
+}
+async function removeForm(f) {
+  if (!confirm(`Remove the section ${f.name} for everyone?\n\nYou can add it again later with “+ Add a form”.`)) return;
+  const at = S.forms.indexOf(f);
+  S.forms.splice(at, 1);
+  try { await saveForms(); }
+  catch (e) { S.forms.splice(at, 0, f); status('Could not save: ' + e.message, true); return; }
+  toast(`${f.name} removed.`);
+  go(S.year, S.forms[0].id);
+}
+
 /* ---------- navigation ---------- */
 function go(year, formId, person = S.person) {
   const target = `#/${person}/${year || '-'}/${formId}`;
@@ -413,7 +488,7 @@ async function openSection() {
   const everyone = Object.values(S.tree.people).flatMap((p) => Object.keys(p.years)).sort();
   // switching person keeps the year; a first visit opens the latest year there is
   const year = m && m[2] !== '-' ? m[2] : S.year || mine[mine.length - 1] || everyone[everyone.length - 1] || String(new Date().getFullYear() - 1);
-  const formId = m && (m[3] === 'rates' || form(m[3])) ? m[3] : S.forms[0].id;
+  const formId = m && (RESERVED.includes(m[3]) || form(m[3])) ? m[3] : S.forms[0].id;
   const canonical = `#/${person}/${year}/${formId}`;
   if (location.hash !== canonical) history.replaceState(null, '', canonical);
   const gen = ++S.gen;
@@ -425,6 +500,7 @@ async function openSection() {
   if (yearChanged || !S.summaries[year]) { await loadSummaries(year); if (gen !== S.gen) return; }
   renderSidebar();
   if (formId === 'rates') { document.title = `Exchange rate ${year} · Taxodermy`; return showRates(); }
+  if (formId === ADD_FORM) { document.title = 'Add a form · Taxodermy'; return showAddForm(); }
   document.title = `${personName()} · ${form().name} ${year} · Taxodermy`;
   if (!has(year, formId + '.pdf')) return showEmpty();
   await loadForm(gen);
@@ -435,7 +511,7 @@ async function teardown() {
   S.pdf = null; S.model = null; S.pages = []; S.base = null; S.basePages = []; S.copies = {}; S.carryCopies = null; S.carryPlan = null; S.prevYear = null; S.linked = null;
   S.values = new Map(); S.touched = new Set(); S.carried = new Map(); S.unmatched = {}; S.meta = {};
   $('formScroll').textContent = ''; $('pages').textContent = '';
-  $('head').hidden = true; $('progress').hidden = true; $('carry').hidden = true; $('work').hidden = true; $('empty').hidden = true; $('ratesView').hidden = true;
+  $('head').hidden = true; $('progress').hidden = true; $('carry').hidden = true; $('work').hidden = true; $('empty').hidden = true; $('ratesView').hidden = true; $('formView').hidden = true;
 }
 
 /* Store a blank PDF for the current person and write its first .json next to it. */
@@ -500,6 +576,12 @@ function showEmpty() {
     btns.append(again);
   }
   d.append(btns);
+  if (S.forms.length > 1 && !formInUse(f.id)) {
+    const rm = el('button', 'btn quiet', 'Remove this section'); rm.type = 'button';
+    rm.title = 'Nobody has a PDF or entries for this form yet, so nothing is lost';
+    rm.onclick = () => removeForm(f);
+    const r = el('div', 'btns remove'); r.append(rm); d.append(r);
+  }
   if (f.irsFile) {
     const s = el('small'); const a = el('a', '', `irs.gov/pub/irs-pdf/${f.irsFile}.pdf`);
     a.href = `https://www.irs.gov/pub/irs-pdf/${f.irsFile}.pdf`; a.target = '_blank'; a.rel = 'noopener';
@@ -960,7 +1042,12 @@ async function addPdfs(files, targetId) {
     let target = targetId ? form(targetId) : guess;
     if (targetId && guess && guess.id !== targetId && confirm(`${file.name} looks like ${guess.name} (${guess.title}), not ${target.name}.\n\nOK = file it under ${guess.name}\nCancel = keep it under ${target.name}`)) target = guess;
     if (!target && pdfs.length === 1 && !has(year, S.formId + '.pdf')) target = form();
-    if (!target) { toast(`Could not tell which form ${file.name} is. Open its section and use “Choose PDF” there.`); continue; }
+    if (!target) {
+      const base = file.name.replace(/\.pdf$/i, '');
+      toast(`Could not tell which form ${file.name} is. Open its section and use “Choose PDF” there.`,
+        { label: 'Add a form for it', run: () => { S.addPrefill = { irsFile: /^f[a-z0-9]+$/i.test(base) ? base.toLowerCase() : '' }; go(year, ADD_FORM); } });
+      continue;
+    }
     const y = guessYear(info.all);
     if (y && y !== year && !confirm(`${file.name} looks like the ${y} revision of ${target.name}, but you are working on ${year}.\n\nAdd it to ${year} anyway?`)) continue;
     if (has(year, target.id + '.pdf') && !confirm(`${target.name} already has a PDF for ${year}. Replace it?\n\nValues you entered are kept for every field that still exists in the new PDF.`)) continue;
@@ -1217,7 +1304,7 @@ addEventListener('hashchange', openSection);
   try {
     await refreshTree();
     const cfg = S.tree.shared.includes('forms.json') ? await api.json('forms.json') : null;
-    if (cfg && Array.isArray(cfg.forms) && cfg.forms.length) S.forms = cfg.forms.filter((f) => f && /^[\w.-]+$/.test(f.id || '') && f.id !== 'rates' && f.name).map((f) => ({ ...(DEFAULT_FORMS.find((d) => d.id === f.id) || {}), ...f }));
+    if (cfg && Array.isArray(cfg.forms) && cfg.forms.length) S.forms = cfg.forms.filter((f) => f && /^[\w.-]+$/.test(f.id || '') && !RESERVED.includes(f.id) && f.name).map((f) => ({ ...(DEFAULT_FORMS.find((d) => d.id === f.id) || {}), ...f }));
     await loadPeople();
     await loadRates();
     await openSection();

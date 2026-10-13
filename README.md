@@ -24,7 +24,8 @@ Opening `index.html` directly does not work: a browser page cannot write files, 
 6. **Save to disk** writes your entries into a copy of the PDF in the same folder (`1040-filled.pdf` next to `1040.pdf`). If you change entries afterwards, the app tells you the copy on disk is out of date until you save again.
 7. **Extra copies of a page.** Form 8938 takes one page 2 per account or asset. In its Page 2 section, **+ Add a copy of this page** gives you the same page again with its own entries; add as many as you need. In the saved PDF each copy follows page 2 with its entries printed on it.
 8. **Print <year>** (top bar) puts every form of the selected person and year that has entries into one document, in the order of the sections, and opens the print dialog. It uses your current entries; nothing is written to disk.
-9. **Exchange rate** (below the forms) holds the IRS yearly average rate for the Swiss franc, one number per tax year, shared by everyone. The converter in the sidebar turns CHF amounts into U.S. dollars at the selected year's rate.
+9. **+ Add a form** (below the forms) adds a section for another IRS form, e.g. Schedule 2: enter its name, the title printed on the form and, optionally, the IRS file name (`f1040s2`). It shows up for every person and year. A section that nobody has a PDF or entries for yet has **Remove this section**.
+10. **Exchange rate** (below the forms) holds the IRS yearly average rate for the Swiss franc, one number per tax year, shared by everyone. The converter in the sidebar turns CHF amounts into U.S. dollars at the selected year's rate.
 
 ## Files
 
@@ -70,7 +71,7 @@ Labels are read from the text printed around each box, so check carried-over val
 
 ## Adding a form
 
-Add an entry to `data/forms.json`:
+Use **+ Add a form** in the app, or add an entry to `data/forms.json` by hand:
 
 ```json
 { "id": "1040-schedule-2", "name": "Schedule 2", "title": "Additional Taxes",
